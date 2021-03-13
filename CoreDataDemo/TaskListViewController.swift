@@ -98,14 +98,13 @@ class TaskListViewController: UITableViewController {
                 print(error.localizedDescription)
             }
         }
-
     }
 }
 
 // MARK: - TAble View Data Source
 extension TaskListViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        taskList.count
+        return taskList.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -115,6 +114,24 @@ extension TaskListViewController {
         content.text = task.name
         cell.contentConfiguration = content
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        true
+    }
+    
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        let taskToDelete = taskList[indexPath.row]
+        context.delete(taskToDelete)
+        
+        do {
+            try context.save()
+            taskList.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .automatic)
+        } catch {
+            let error = error
+            print(error.localizedDescription)
+        }
     }
 }
 
